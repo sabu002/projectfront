@@ -2,6 +2,7 @@ import React from 'react'
 import { useAppContext } from '../context/AppContext';
 import toast from 'react-hot-toast';
 
+import { Link } from 'react-router-dom';
 const Login = () => {
     const{setShowUserLogin, setUser,axios,navigate}= useAppContext()
       const [state, setState] = React.useState("login");
@@ -61,6 +62,19 @@ const Login = () => {
                 <p>Password</p>
                 <input onChange={(e) => setPassword(e.target.value)} value={password} placeholder="type here" className="border border-gray-200 rounded w-full p-2 mt-1 outline-primary" type="password" required />
             </div>
+           <div className="forget-password">
+      <button
+        type="button"
+        className="text-primary hover:underline"
+        onClick={() => {
+          setShowUserLogin(false);          // close modal
+          navigate("/forgetpassword");     // go to page
+        }}
+      >
+        Forgot Password?
+      </button>
+    </div>
+
             {state === "register" ? (
                 <p>
                     Already have account? <span onClick={() => setState("login")} className="text-primary cursor-pointer">click here</span>

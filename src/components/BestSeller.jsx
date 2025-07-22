@@ -1,9 +1,19 @@
 import React from 'react'
 import ProductCard from './ProductCard'
 import { useAppContext } from '../context/AppContext'
+import { useEffect } from 'react';
+import axios from 'axios';
 
 const BestSeller = () => {
-    const {products}=useAppContext();
+    const {products,user}=useAppContext();
+    useEffect(() => {
+  const fetchRecommendations = async () => {
+    const res = await axios.get(`/api/recommend/${user._id}`);
+    setRecommended(res.data.recommendations);
+  };
+  fetchRecommendations();
+}, []);
+
   return (
     <div className='mt-16'>
       <p className='text-2xl md:text-3xl font-medium'> Best Seller</p>

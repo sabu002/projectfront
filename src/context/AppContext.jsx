@@ -83,21 +83,26 @@ export const AppContextProvider = ({children})=>{
 
 
 
- // add product to card
- const addToCart= (itemId)=>{
+const addToCart = (itemId) => {
+  if (!user) {
+    toast.error("Please login to add items to your cart.");
+    setShowUserLogin(true); // if you're using a login modal
+    return;
+  }
 
-    let cartData= structuredClone(cartItems);
-    if(cartData[itemId]){
-        cartData[itemId]+=1;
-    }
- else{
-    cartData[itemId]=1;
- }
- setCartItems(cartData)
- console.log('The data is ', cartData)
- toast.success("card Added")
- 
-}
+  let cartData = structuredClone(cartItems);
+
+  if (cartData[itemId]) {
+    cartData[itemId] += 1;
+  } else {
+    cartData[itemId] = 1;
+  }
+
+  setCartItems(cartData);
+  console.log('The data is', cartData);
+  toast.success("Item added to cart");
+};
+
 // Update cart item quantity
 const updateCartItem =(itemId,quantity)=>{
     let cartData = structuredClone(cartItems);

@@ -3,7 +3,8 @@ import { assets } from "../assets/assets";
 import { useAppContext } from "../context/AppContext";
 const ProductCard = ({product}) => {
     
-    const {currency,addToCart,removeFromCart,cartItems,navigate} = useAppContext()
+    const {currency,addToCart,removeFromCart,cartItems,navigate,user} = useAppContext()
+   
 
     
 
@@ -40,7 +41,7 @@ const ProductCard = ({product}) => {
                                     -
                                 </button>
                                 <span className="w-5 text-center">{cartItems[product._id]}</span>
-                                <button onClick={() =>{ addToCart(product._id)} }className="cursor-pointer text-md px-2 h-full" >
+                                <button onClick={() =>{ addToCart(product._id)}  }className="cursor-pointer text-md px-2 h-full"   disabled={!user} >
                                     +
                                 </button>
                             </div>

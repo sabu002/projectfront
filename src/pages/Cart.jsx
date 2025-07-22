@@ -38,33 +38,120 @@ const Cart = () => {
  }
 
 
-        const placeOrder= async()=>{
-            try{
-                if(!selectedAddress){
-                    return toast.error("please select an address")
-                }
-                // place order with COD
-                if(paymentOption === "COD"){
-                    const{data}= await axios.post('/api/order/cod',{
-                        userId: user._id,
-                        items:cartArray.map(item=>({ 
-                            product:item._id,quantity:item.quantity
-                        })),
-                        address:selectedAddress._id
-                    })
-                    if(data.success){
-                        toast.success(data.message)
-                        setCartItems({})
-                        navigate('/my-orders')
-                    }else{
-                        toast.error(data.message)
-                    }
-                }
-            }catch(error){
-                toast.error(error.message)
-            }
+        // const placeOrder= async()=>{
+        //     try{
+        //         if(!selectedAddress){
+        //             return toast.error("please select an address")
+        //         }
+        //         // place order with COD
+        //         if(paymentOption === "COD"){
+        //             const{data}= await axios.post('/api/order/cod',{
+        //                 userId: user._id,
+        //                 items:cartArray.map(item=>({ 
+        //                     product:item._id,quantity:item.quantity
+        //                 })),
+        //                 address:selectedAddress._id
+        //             })
+        //             if(data.success){
+        //                 toast.success(data.message)
+        //                 setCartItems({})
+        //                 navigate('/my-orders')
+        //             }else{
+        //                 toast.error(data.message)
+        //             }
+        //         }
+        //     }catch(error){
+        //         toast.error(error.message)
+        //     }
 
-        }
+        // }
+        // ⬇️  REPLACE your current placeOrder with this one
+const placeOrder = async () => {
+  try {
+    if (!selectedAddress) {
+      return toast.error("Please select an address");
+    }
+
+    /* ────────────────────────────────
+       1.  CASH‑ON‑DELIVERY
+    ──────────────────────────────── */
+    if (paymentOption === "COD") {
+      const { data } = await axios.post("/api/order/cod", {
+        userId: user._id,
+        items: cartArray.map((item) => ({
+          product: item._id,
+          quantity: item.quantity,
+        })),
+        address: selectedAddress._id,
+      });
+
+      if (data.success) {
+        toast.success(data.message);
+        setCartItems({});
+        navigate("/my-orders");
+      } else {
+        toast.error(data.message);
+      }
+      return; // ✅ nothing more to do for COD
+    }
+
+    /* ────────────────────────────────
+       2.  eSEWA  (paymentOption === "Online")
+    ──────────────────────────────── */
+    const transactionId = `${Date.now()}_${user._id}`;
+    const amountWithoutTax = getCartAmount();
+    const totalAmount      = amountWithoutTax + amountWithoutTax * 0.02; // add 2 % tax
+
+    const { data } = await axios.post("/api/checkout-session", {
+      amount: +totalAmount.toFixed(2), // round & cast to number
+      productName: "GreenCart Order",
+      transactionId,
+      method: "esewa",
+    });
+
+    if (!data.esewaConfig) {
+      return toast.error("Failed to initiate eSewa payment.");
+    }
+
+    /*  Create a hidden HTML form and POST it to eSewa  */
+    const esewaParams = {
+      amt:  data.esewaConfig.total_amount,
+      psc:  data.esewaConfig.product_service_charge,
+      pdc:  data.esewaConfig.product_delivery_charge,
+      txAmt:data.esewaConfig.tax_amount,
+      tAmt: data.esewaConfig.total_amount,
+      pid:  data.esewaConfig.transaction_uuid,
+      scd:  data.esewaConfig.product_code,
+      su:   data.esewaConfig.success_url,
+      fu:   data.esewaConfig.failure_url,
+      signature: data.esewaConfig.signature,
+    };
+
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = "https://epay.esewa.com.np/api/epay/main/v2/form";
+    form.style.display = "none";
+
+    Object.entries(esewaParams).forEach(([name, value]) => {
+      const input = document.createElement("input");
+      input.type  = "hidden";
+      input.name  = name;
+      input.value = value;
+      form.appendChild(input);
+    });
+
+    document.body.appendChild(form);
+    form.submit();         // 🔀 browser redirects to eSewa’s payment page
+  } catch (err) {
+    console.error("Payment error:", err);
+    toast.error(
+      err?.response?.data?.message ||
+      err.message ||
+      "Something went wrong."
+    );
+  }
+};
+
         useEffect(()=>{
         if(products.length>0 && cartItems){
             let productsCopy = products.filter((item) => item.category === cartItems.category && item)
