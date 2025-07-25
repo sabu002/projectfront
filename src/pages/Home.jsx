@@ -6,12 +6,15 @@ import ButtomBanner from '../components/ButtomBanner'
 import NewsLetter from '../components/NewsLetter'
 import Footer from '../components/Footer'
 
+
 const Home = () => {
+
   return (
     <div className='mt-10'>
       <MainBanner/>
       <Categories/>
       <BestSeller/>
+     
       <ButtomBanner/>
       <NewsLetter/>
       

@@ -5,14 +5,19 @@ import { useEffect } from 'react';
 import axios from 'axios';
 
 const BestSeller = () => {
-    const {products,user}=useAppContext();
+    const { products, user } = useAppContext();
     useEffect(() => {
-  const fetchRecommendations = async () => {
-    const res = await axios.get(`/api/recommend/${user._id}`);
-    setRecommended(res.data.recommendations);
-  };
-  fetchRecommendations();
-}, []);
+      if (!user || !user._id) return;
+      const fetchRecommendations = async () => {
+        try {
+          const res = await axios.get(`http://localhost:2000/api/recommend/${user._id}`);
+          setRecommended(res.data.recommendations);
+        } catch (error) {
+          // Optionally handle error (e.g., user not found)
+        }
+      };
+      fetchRecommendations();
+    }, [user]);
 
   return (
     <div className='mt-16'>

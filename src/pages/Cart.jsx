@@ -3,6 +3,7 @@ import { useAppContext } from "../context/AppContext"
 import { assets, dummyAddress } from "../assets/assets"
 import { useEffect } from "react"
 import toast from "react-hot-toast"
+import { generateUniqueId } from "../utils/helper";
 
 const Cart = () => {
     const { products,currency,cartItems, removeFromCart, getCartCount, updateCartItem,navigate,getCartAmount,axios,user,setCartItems} = useAppContext()
@@ -18,12 +19,12 @@ const Cart = () => {
                 const product = products.find((item)=> item._id===key)
                 product.quantity= cartItems[key]
                 tempArray.push(product)
-            }
+            }   
             setCartArray(tempArray)
         }
  const getUserAddress = async()=>{
     try{
-        const{data}= await axios.get('/api/address/get');
+        const{data}= await axios.get('http://localhost:2000/api/address/get');
         if(data.success){
             setAddresses(data.addresses)
             if(data.addresses.length>0){
@@ -95,53 +96,32 @@ const placeOrder = async () => {
       return; // ✅ nothing more to do for COD
     }
 
-    /* ────────────────────────────────
-       2.  eSEWA  (paymentOption === "Online")
-    ──────────────────────────────── */
-    const transactionId = `${Date.now()}_${user._id}`;
-    const amountWithoutTax = getCartAmount();
-    const totalAmount      = amountWithoutTax + amountWithoutTax * 0.02; // add 2 % tax
+    // Online payment (eSewa)
+    if (paymentOption === "Online") {
+      const transactionId = generateUniqueId();
+      const amountWithoutTax = getCartAmount();
+      const totalAmount = amountWithoutTax + amountWithoutTax * 0.02;
 
-    const { data } = await axios.post("/api/checkout-session", {
-      amount: +totalAmount.toFixed(2), // round & cast to number
-      productName: "GreenCart Order",
-      transactionId,
-      method: "esewa",
-    });
+      const { data } = await axios.post("http://localhost:2000/payment/initiate-payment", {
+        amount: +totalAmount.toFixed(2),
+        productId: transactionId,
+        paymentGateway: "esewa",
+        customerName: user.name,
+        customerEmail: user.email,
+        productName: "GreenCart Order",
+      });
+      console.log("data here:",data)
 
-    if (!data.esewaConfig) {
-      return toast.error("Failed to initiate eSewa payment.");
+      if (!data.url) {
+        return toast.error("Failed to initiate eSewa payment.");
+      }
+
+      // Redirect to eSewa payment URL
+      window.location.href = data.url;
+      return;
     }
+    
 
-    /*  Create a hidden HTML form and POST it to eSewa  */
-    const esewaParams = {
-      amt:  data.esewaConfig.total_amount,
-      psc:  data.esewaConfig.product_service_charge,
-      pdc:  data.esewaConfig.product_delivery_charge,
-      txAmt:data.esewaConfig.tax_amount,
-      tAmt: data.esewaConfig.total_amount,
-      pid:  data.esewaConfig.transaction_uuid,
-      scd:  data.esewaConfig.product_code,
-      su:   data.esewaConfig.success_url,
-      fu:   data.esewaConfig.failure_url,
-      signature: data.esewaConfig.signature,
-    };
-
-    const form = document.createElement("form");
-    form.method = "POST";
-    form.action = "https://epay.esewa.com.np/api/epay/main/v2/form";
-    form.style.display = "none";
-
-    Object.entries(esewaParams).forEach(([name, value]) => {
-      const input = document.createElement("input");
-      input.type  = "hidden";
-      input.name  = name;
-      input.value = value;
-      form.appendChild(input);
-    });
-
-    document.body.appendChild(form);
-    form.submit();         // 🔀 browser redirects to eSewa’s payment page
   } catch (err) {
     console.error("Payment error:", err);
     toast.error(

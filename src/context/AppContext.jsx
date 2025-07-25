@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { dummyProducts } from "../assets/assets";
 import toast from "react-hot-toast";
 import axios from 'axios';
-import Fuse from 'fuse.js';
+// import Fuse from 'fuse.js';
 
 
 axios.defaults.baseURL= import.meta.env.VITE_BACKEND_URL;
@@ -66,20 +66,26 @@ export const AppContextProvider = ({children})=>{
         }
     }
     useEffect(() => {
-    if (searchQuery.length === 0) {
-        setFilteredProducts([]);
-        return;
-    }
-
-    const fuse = new Fuse(products, {
-        keys: ['name', 'category'],  // You can add more fields like 'description'
-        threshold: 0.3               // Lower means stricter match
-    });
-
-    const result = fuse.search(searchQuery);
-    const matched = result.map(r => r.item);
-    setFilteredProducts(matched);
-}, [searchQuery, products]);
+      const fetchSearch = async () => {
+        if (!searchQuery || searchQuery.length === 0) {
+          setFilteredProducts(products);
+          return;
+        }
+        try {
+          const { data } = await axios.get(`/api/product/search?query=${encodeURIComponent(searchQuery)}`);
+          if (data.success) {
+            setFilteredProducts(data.products);
+          } else {
+            setFilteredProducts([]);
+            toast.error(data.message);
+          }
+        } catch (error) {
+          setFilteredProducts([]);
+          toast.error(error.message);
+        }
+      };
+      fetchSearch();
+    }, [searchQuery]);
 
 
 
