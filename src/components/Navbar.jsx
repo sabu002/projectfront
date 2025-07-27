@@ -4,6 +4,7 @@ import { assets } from '../assets/assets'
 import { useAppContext } from '../context/AppContext'
 import { useEffect } from 'react'
 import toast from 'react-hot-toast'
+import api from '../API/axios'
 
 
 
@@ -14,7 +15,7 @@ const Navbar = () => {
     
     const logout= async()=>{
     try{
-        const{data }= await axios.get('/api/user/logout')
+        const{data }= await api.get('/user/logout')
         if(data.success){
             toast.success(data.message)
              setUser(null);
@@ -34,8 +35,9 @@ const Navbar = () => {
         }
     },[searchQuery])
   return (
+    <div className='fixed z-50 h-fit w-full top-0 left-0'>
 
-      <nav className="flex items-center justify-between px-6 md:px-16 lg:px-24 xl:px-32 py-4 border-b border-gray-300 bg-white relative transition-all">
+    <nav className="flex items-center justify-between px-6 md:px-16 lg:px-24 xl:px-32 py-4 border-b border-gray-300 bg-white relative transition-all">
 
             <NavLink to="/" onClick={()=> setOpen(false)}>
                 <img className="h-9" src={assets.logo}    alt="logo" />
@@ -45,7 +47,8 @@ const Navbar = () => {
             <div className="hidden sm:flex items-center gap-8">
                 <NavLink to="/"> Home</NavLink>
                  <NavLink to="/products"> All Product</NavLink>
-                  <NavLink to="/"> Contact</NavLink>
+                 <NavLink to="/about">About us</NavLink>
+                  <NavLink to="/contact"> Contact</NavLink>
 
                 <div className="hidden lg:flex items-center text-sm gap-2 border border-gray-300 px-3 rounded-full">
                     <input  onChange={(e)=> setSearchQuery(e.target.value)} className="py-1.5 w-full bg-transparent outline-none placeholder-gray-500" type="text" placeholder="Search products" />
@@ -130,6 +133,7 @@ const Navbar = () => {
             )}
 
         </nav>
+    </div>
 
 
   )

@@ -53,6 +53,7 @@ import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAppContext } from "../context/AppContext";
 import toast from "react-hot-toast";
+import api from "../API/axios";
 
 const PaymentSuccess = () => {
   const navigate = useNavigate();
@@ -80,7 +81,7 @@ const PaymentSuccess = () => {
       }
 
       try {
-        const { data } = await axios.post("/payment/payment-status", {
+        const { data } = await api.post("/payment/payment-status", {
           productId: transactionUuid,
           status: parsedData?.status || "SUCCESS", // fallback to "SUCCESS"
         });

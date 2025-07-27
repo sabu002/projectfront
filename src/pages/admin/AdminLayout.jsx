@@ -5,16 +5,16 @@ import { useAppContext } from "../../context/AppContext";
 import toast from "react-hot-toast";
 import api from "../../API/axios";
 
-const SellerLayout = () => {
-    const{setIsSeller,navigate,axios}= useAppContext();
+const AdminLayout = () => {
+    const{setIsAdmin,navigate,axios}= useAppContext();
       const sidebarLinks = [
-        { name: "Add Product", path: "/seller", icon: assets.add_icon },
-        { name: "Product List", path: "/seller/product-list", icon: assets.product_list_icon },
-        { name: "Orders", path: "/seller/orders", icon: assets.order_icon },
+       
+        { name: "Product List", path: "/admin/product-list", icon: assets.product_list_icon },
+        { name: "Orders", path: "/admin/orders", icon: assets.order_icon },
     ];
     const logout= async()=>{
        try{
-        const{data} = await api.get('/seller/logout');
+        const{data} = await api.get('/admin/logout');
         if(data.success){
             toast.success(data.message)
            navigate('/')
@@ -34,7 +34,7 @@ const SellerLayout = () => {
                <img src={assets.logo} alt="logo" className="cursor-pointer w-34 md:w-38"/>
                </Link>
                 <div className="flex items-center gap-5 text-gray-500">
-                    <p>Hi! Seller</p>
+                    <p>Hi! Admin</p>
                     <button onClick={logout} className='border rounded-full text-sm px-4 py-1'>Logout</button>
                 </div>
             </div>
@@ -58,4 +58,4 @@ const SellerLayout = () => {
         </>
     );
 };
-export default SellerLayout;
+export default AdminLayout;

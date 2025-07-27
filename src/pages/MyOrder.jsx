@@ -2,13 +2,14 @@ import React, { useEffect } from 'react'
 import { useState } from 'react'
 import { useAppContext } from '../context/AppContext'
 import {  dummyOrders } from '../assets/assets'
+import api from '../API/axios'
 
 const MyOrder = () => {
   const [myOrders,setMyOrders]=useState([])
   const {currency ,user,axios}= useAppContext()
   const fetchMyOrders= async()=>{
     try{
-    const{data}= await axios.get('/api/order/user')
+    const{data}= await api.get('/order/user')
     if(data.success){
       setMyOrders(data.orders)
     }
@@ -23,7 +24,7 @@ const MyOrder = () => {
   },[user])
   return (
     
-    <div className='mt-16 pb-16'>
+    <div className='mt-30 pb-16'>
    <div className='flex flex-col items-end w-max mb-8'>
         <p className=' text-2xl font-medium uppercase'>My orders</p>
         <div className='w-16 h-0.5 bg-primary rounded-full'> </div>

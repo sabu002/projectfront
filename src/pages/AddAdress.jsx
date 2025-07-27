@@ -3,6 +3,7 @@ import { assets } from "../assets/assets";
 import { useAppContext } from "../context/AppContext";
 import toast from "react-hot-toast";
 import { useEffect } from "react";
+import api from "../API/axios";
 //input field Component
 const InputField = ({ type, placeholder, name, handleChange, address }) => (
   <input
@@ -38,7 +39,7 @@ const AddAdress = () => {
   const onSubmitHandler = async (e) => {
     e.preventDefault();
     try {
-      const { data } = await axios.post("/api/address/add", {
+      const { data } = await api.post("/address/add", {
         address,
         userId: user._id,
       });
@@ -59,7 +60,7 @@ const AddAdress = () => {
     }
   }, []);
   return (
-    <div className="mt-16 pb-16 ">
+    <div className="mt-30 pb-16 ">
       <p className="text-2xl md:text-3xl text-gray-500">
         {" "}
         Add Shipping{" "}

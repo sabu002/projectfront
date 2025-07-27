@@ -2,9 +2,11 @@ import React from 'react'
 import { useAppContext } from '../context/AppContext';
 import toast from 'react-hot-toast';
 
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import api from '../API/axios';
 const Login = () => {
-    const{setShowUserLogin, setUser,axios,navigate}= useAppContext()
+    const{setShowUserLogin, setUser}= useAppContext();
+    const navigate=useNavigate();
       const [state, setState] = React.useState("login");
     const [name, setName] = React.useState("");
     const [email, setEmail] = React.useState("");
@@ -25,7 +27,7 @@ const Login = () => {
   }
        try{
          event.preventDefault()
-         const {data} = await axios.post(`/api/user/${state}`,{name,email,password});
+         const {data} = await api.post(`/user/${state}`,{name,email,password});
          if(data.success){
             navigate('/')
             setUser(data.user)

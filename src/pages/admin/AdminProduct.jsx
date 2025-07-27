@@ -1,11 +1,9 @@
 import React from 'react'
-import { useAppContext } from '../../context/AppContext'
-import toast from 'react-hot-toast'
-import api from '../../API/axios'
+import { useAppContext } from '../../context/AppContext';
+import api from '../../API/axios';
 
-
-const ProductList = () => {
-    const {products,currency,axios,fetchProducts}= useAppContext()
+const AdminProduct = () => {
+     const {products,currency,axios,fetchProducts}= useAppContext()
     const toogleStock = async(id,inStock)=>{
         try{
             const{data}= await api.post('/product/stock',{id,inStock});
@@ -19,7 +17,6 @@ const ProductList = () => {
             toast.error(error.message)
         }
     }
-    
   return (
     <div className="no-scrollbar flex-1 h-[95vh] overflow-y-scroll flex flex-col justify-between">
             <div className="w-full md:p-10 p-4">
@@ -58,4 +55,4 @@ const ProductList = () => {
   )
 }
 
-export default ProductList
+export default AdminProduct

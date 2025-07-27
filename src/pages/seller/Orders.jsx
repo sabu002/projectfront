@@ -3,13 +3,14 @@ import { useAppContext } from '../../context/AppContext'
 import { assets, dummyOrders } from '../../assets/assets'
 import toast from 'react-hot-toast'
 import axios from 'axios'
+import api from '../../API/axios'
 
 const Orders = () => {
     const{currency} = useAppContext()
     const[orders,setOrders]=useState([])
     const fetchOrders = async()=>{
        try{
-    const{data}= await axios.get('/api/order/seller')
+    const{data}= await api.get('/order/seller')
     if(data.success){
       setOrders(data.orders)
     }else{

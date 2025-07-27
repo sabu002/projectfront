@@ -68,7 +68,7 @@ const AllProduct = () => {
   const handleRatingChange = (val) => setSelectedRating(val);
 
   return (
-    <div className='mt-16 flex flex-col md:flex-row gap-6'>
+    <div className='mt-30 flex flex-col md:flex-row gap-6'>
       {/* Sidebar */}
       <div className={`fixed md:static z-40 top-0 left-0 h-full w-64 bg-white border-r border-gray-200 p-6 transition-transform duration-200 md:translate-x-0 ${showSidebar ? 'translate-x-0' : '-translate-x-full'} md:block`}> 
         <div className='flex justify-between items-center mb-6 md:hidden'>
